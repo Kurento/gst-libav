@@ -17,16 +17,16 @@ LDFLAGS += -Wl,-z,defs -Wl,-O1 -Wl,--as-needed
 DISTRO = "$(shell dpkg-vendor --query vendor)"
 
 GST_PACKAGE_NAME := "GStreamer libav Plugins (unknown Debian derivative)"
-GST_PACKAGE_ORIGIN="http://packages.qa.debian.org/gst-libav1.0"
+GST_PACKAGE_ORIGIN="http://packages.qa.debian.org/gst-libav1.5"
 
 ifeq ($(DISTRO),"Debian")
 GST_PACKAGE_NAME := "GStreamer libav Plugins (Debian)"
-GST_PACKAGE_ORIGIN="http://packages.qa.debian.org/gst-libav1.0"
+GST_PACKAGE_ORIGIN="http://packages.qa.debian.org/gst-libav1.5"
 endif
 
 ifeq ($(DISTRO),"Ubuntu")
 GST_PACKAGE_NAME := "GStreamer libav Plugins (Ubuntu)"
-GST_PACKAGE_ORIGIN="https://launchpad.net/distros/ubuntu/+source/gst-libav1.0"
+GST_PACKAGE_ORIGIN="https://launchpad.net/distros/ubuntu/+source/gst-libav1.5"
 endif
 
 
@@ -39,11 +39,11 @@ DEB_CONFIGURE_EXTRA_FLAGS += --with-system-libav \
 
 DEB_INSTALL_DOCS_ALL += debian/README.Debian NEWS
 
-DEB_DH_STRIP_ARGS := --dbg-package=gstreamer1.0-libav-dbg
+DEB_DH_STRIP_ARGS := --dbg-package=gstreamer1.5-libav-dbg
 
-install/gst-libav1.0::
-	rm -f debian/gstreamer1.0-libav/usr/lib/*/gstreamer-1.0/libgst*.la
-	rm -f debian/gstreamer1.0-libav/usr/lib/*/gstreamer-1.0/libgst*.a
+install/gst-libav1.5::
+	rm -f debian/gstreamer1.5-libav/usr/lib/*/gstreamer-1.5/libgst*.la
+	rm -f debian/gstreamer1.5-libav/usr/lib/*/gstreamer-1.5/libgst*.a
 
 common-binary-fixup-arch::
 	dh_gstscancodecs

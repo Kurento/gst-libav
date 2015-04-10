@@ -38,7 +38,7 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],
 dnl our libraries and install dirs use major.minor as a version
 GST_API_VERSION=$PACKAGE_VERSION_MAJOR.$PACKAGE_VERSION_MINOR
 dnl we override it here if we need to for the release candidate of new series
-GST_API_VERSION=1.0
+GST_API_VERSION=1.5
 AC_SUBST(GST_API_VERSION)
 
 AG_GST_LIBTOOL_PREPARE

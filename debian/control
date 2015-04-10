@@ -1,4 +1,4 @@
-Source: gst-libav1.0
+Source: gst-libav1.5
 Section: libs
 Priority: optional
 Maintainer: Maintainers of GStreamer packages <pkg-gstreamer-maintainers@lists.alioth.debian.org>
@@ -18,8 +18,8 @@ Build-Depends: debhelper (>= 9),
                zlib1g-dev,
                libglib2.0-dev (>= 2.32),
                pkg-config (>= 0.11.0),
-               libgstreamer1.0-dev (>= 1.5.0.1+git20150316),
-               libgstreamer-plugins-base1.0-dev (>= 1.5.0.1+git20150316),
+               libgstreamer1.5-dev (>= 1.5.0.1~0),
+               libgstreamer-plugins-base1.5-dev (>= 1.5.0.1~0),
                liborc-0.4-dev (>= 1:0.4.16),
                libavcodec-dev (>= 6:11~),
                libavformat-dev (>= 6:11~),
@@ -31,7 +31,7 @@ Vcs-Git: git://anonscm.debian.org/pkg-gstreamer/gst-libav1.0.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-gstreamer/gst-libav1.0.git;a=summary
 Homepage: http://gstreamer.freedesktop.org/modules/gst-libav.html
 
-Package: gstreamer1.0-libav
+Package: gstreamer1.5-libav
 Architecture: any
 Multi-Arch: same
 Section: libs
@@ -55,14 +55,14 @@ Description: libav plugin for GStreamer
  http://gstreamer.freedesktop.org/
  http://gstreamer.freedesktop.org/modules/gst-libav.html
 
-Package: gstreamer1.0-libav-dbg
+Package: gstreamer1.5-libav-dbg
 Architecture: any
 Multi-Arch: same
 Section: debug
 Priority: extra
 Depends: ${misc:Depends},
          ${shlibs:Depends},
-         gstreamer1.0-libav (= ${binary:Version})
+         gstreamer1.5-libav (= ${binary:Version})
 XB-GStreamer-Version: ${gstreamer:Version}
 XB-GStreamer-Elements: ${gstreamer:Elements}
 XB-GStreamer-URI-Sources: ${gstreamer:URISources}
