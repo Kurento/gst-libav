@@ -3,7 +3,7 @@ AC_PREREQ(2.69)
 dnl initialize autoconf
 dnl when going to/from release please set the nano (fourth number) right !
 dnl releases only do Wall, cvs and prerelease does Werror too
-AC_INIT(GStreamer libav, 1.5.0.1,
+AC_INIT(GStreamer libav, 1.5.1.1,
     http://bugzilla.gnome.org/enter_bug.cgi?product=GStreamer,
     gst-libav)
 
@@ -43,8 +43,8 @@ AG_GST_LIBTOOL_PREPARE
 AS_LIBTOOL(GST, 501, 0, 501)
 
 dnl *** required versions of GStreamer stuff ***
-GST_REQ=1.5.0.1
-GST_PBREQ=1.5.0.1
+GST_REQ=1.5.1.1
+GST_PBREQ=1.5.1.1
 
 ORC_REQ=0.4.16
 ORC_CHECK([$ORC_REQ])
@@ -307,9 +307,9 @@ else
   # Enable pic and static so that we get .a files, but with PIC code.
   emblibav_configure_args="$emblibav_configure_args --disable-avserver --disable-avplay\
         --disable-avconv --disable-avprobe --enable-static --enable-pic \
-	--disable-encoder=flac --disable-decoder=cavs --disable-protocols --disable-devices\
-	--disable-network --disable-hwaccels --disable-dxva2 --disable-vdpau\
-	--disable-filters --disable-doc --enable-optimizations"
+        --disable-encoder=flac --disable-protocols --disable-devices\
+        --disable-network --disable-hwaccels --disable-dxva2 --disable-vdpau\
+        --disable-filters --disable-doc --enable-optimizations"
 
   if test "x$enable_lgpl" != "xyes"; then
     emblibav_configure_args="$emblibav_configure_args --enable-gpl"
