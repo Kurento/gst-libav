@@ -246,7 +246,7 @@ gst_ffmpegvidenc_init (GstFFMpegVidEnc * ffmpegenc)
 
   /* ffmpeg objects */
   ffmpegenc->context = avcodec_alloc_context3 (klass->in_plugin);
-  ffmpegenc->picture = avcodec_alloc_frame ();
+  ffmpegenc->picture = av_frame_alloc ();
   ffmpegenc->opened = FALSE;
 
   ffmpegenc->file = NULL;
@@ -274,9 +274,9 @@ gst_ffmpegvidenc_finalize (GObject * object)
   gst_ffmpeg_cfg_finalize (ffmpegenc);
 
   /* clean up remaining allocated data */
+  av_frame_free (&ffmpegenc->picture);
   gst_ffmpeg_avcodec_close (ffmpegenc->context);
   av_free (ffmpegenc->context);
-  avcodec_free_frame (&ffmpegenc->picture);
 
   g_free (ffmpegenc->filename);
 
@@ -355,9 +355,6 @@ gst_ffmpegvidenc_set_format (GstVideoEncoder * encoder,
   if (ffmpegenc->interlaced) {
     ffmpegenc->context->flags |=
         CODEC_FLAG_INTERLACED_DCT | CODEC_FLAG_INTERLACED_ME;
-    ffmpegenc->picture->interlaced_frame = TRUE;
-    /* if this is not the case, a filter element should be used to swap fields */
-    ffmpegenc->picture->top_field_first = TRUE;
   }
 
   /* some other defaults */
@@ -580,6 +577,22 @@ gst_ffmpegvidenc_free_avpacket (gpointer pkt)
   g_slice_free (AVPacket, pkt);
 }
 
+typedef struct
+{
+  GstBuffer *buffer;
+  GstVideoFrame vframe;
+} BufferInfo;
+
+static void
+buffer_info_free (void *opaque, guint8 * data)
+{
+  BufferInfo *info = opaque;
+
+  gst_video_frame_unmap (&info->vframe);
+  gst_buffer_unref (info->buffer);
+  g_slice_free (BufferInfo, info);
+}
+
 static GstFlowReturn
 gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
     GstVideoCodecFrame * frame)
@@ -588,24 +601,40 @@ gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
   GstBuffer *outbuf;
   gint ret = 0, c;
   GstVideoInfo *info = &ffmpegenc->input_state->info;
-  GstVideoFrame vframe;
   AVPacket *pkt;
   int have_data = 0;
+  BufferInfo *buffer_info;
+
+  if (ffmpegenc->interlaced) {
+    ffmpegenc->picture->interlaced_frame = TRUE;
+    /* if this is not the case, a filter element should be used to swap fields */
+    ffmpegenc->picture->top_field_first =
+        GST_BUFFER_FLAG_IS_SET (frame->input_buffer, GST_VIDEO_BUFFER_FLAG_TFF);
+  }
 
   if (GST_VIDEO_CODEC_FRAME_IS_FORCE_KEYFRAME (frame))
     ffmpegenc->picture->pict_type = AV_PICTURE_TYPE_I;
 
-  if (!gst_video_frame_map (&vframe, info, frame->input_buffer, GST_MAP_READ)) {
+  buffer_info = g_slice_new0 (BufferInfo);
+  buffer_info->buffer = gst_buffer_ref (frame->input_buffer);
+
+  if (!gst_video_frame_map (&buffer_info->vframe, info, frame->input_buffer,
+          GST_MAP_READ)) {
     GST_ERROR_OBJECT (encoder, "Failed to map input buffer");
+    gst_buffer_unref (buffer_info->buffer);
+    g_slice_free (BufferInfo, buffer_info);
     return GST_FLOW_ERROR;
   }
 
   /* Fill avpicture */
+  ffmpegenc->picture->buf[0] =
+      av_buffer_create (NULL, 0, buffer_info_free, buffer_info, 0);
   for (c = 0; c < AV_NUM_DATA_POINTERS; c++) {
     if (c < GST_VIDEO_INFO_N_COMPONENTS (info)) {
-      ffmpegenc->picture->data[c] = GST_VIDEO_FRAME_PLANE_DATA (&vframe, c);
+      ffmpegenc->picture->data[c] =
+          GST_VIDEO_FRAME_PLANE_DATA (&buffer_info->vframe, c);
       ffmpegenc->picture->linesize[c] =
-          GST_VIDEO_FRAME_COMP_STRIDE (&vframe, c);
+          GST_VIDEO_FRAME_COMP_STRIDE (&buffer_info->vframe, c);
     } else {
       ffmpegenc->picture->data[c] = NULL;
       ffmpegenc->picture->linesize[c] = 0;
@@ -623,7 +652,7 @@ gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
       avcodec_encode_video2 (ffmpegenc->context, pkt, ffmpegenc->picture,
       &have_data);
 
-  gst_video_frame_unmap (&vframe);
+  av_frame_unref (ffmpegenc->picture);
 
   if (ret < 0 || !have_data)
     g_slice_free (AVPacket, pkt);
@@ -648,8 +677,8 @@ gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
   frame = gst_video_encoder_get_oldest_frame (encoder);
 
   outbuf =
-      gst_buffer_new_wrapped_full (0, pkt->data, pkt->size, 0, pkt->size, pkt,
-      gst_ffmpegvidenc_free_avpacket);
+      gst_buffer_new_wrapped_full (GST_MEMORY_FLAG_READONLY, pkt->data,
+      pkt->size, 0, pkt->size, pkt, gst_ffmpegvidenc_free_avpacket);
   frame->output_buffer = outbuf;
 
   /* buggy codec may not set coded_frame */
@@ -658,10 +687,6 @@ gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
       GST_VIDEO_CODEC_FRAME_SET_SYNC_POINT (frame);
   } else
     GST_WARNING_OBJECT (ffmpegenc, "codec did not provide keyframe info");
-
-  /* Reset frame type */
-  if (ffmpegenc->picture->pict_type)
-    ffmpegenc->picture->pict_type = 0;
 
   return gst_video_encoder_finish_frame (encoder, frame);
 
@@ -686,7 +711,7 @@ gst_ffmpegvidenc_flush_buffers (GstFFMpegVidEnc * ffmpegenc, gboolean send)
   GstFlowReturn flow_ret = GST_FLOW_OK;
   GstBuffer *outbuf;
   gint ret;
-  AVPacket pkt;
+  AVPacket *pkt;
   int have_data = 0;
 
   GST_DEBUG_OBJECT (ffmpegenc, "flushing buffers with sending %d", send);
@@ -697,10 +722,10 @@ gst_ffmpegvidenc_flush_buffers (GstFFMpegVidEnc * ffmpegenc, gboolean send)
 
   while ((frame =
           gst_video_encoder_get_oldest_frame (GST_VIDEO_ENCODER (ffmpegenc)))) {
-    memset (&pkt, 0, sizeof (pkt));
+    pkt = g_slice_new0 (AVPacket);
     have_data = 0;
 
-    ret = avcodec_encode_video2 (ffmpegenc->context, &pkt, NULL, &have_data);
+    ret = avcodec_encode_video2 (ffmpegenc->context, pkt, NULL, &have_data);
 
     if (ret < 0) {              /* there should be something, notify and give up */
 #ifndef GST_DISABLE_GST_DEBUG
@@ -709,6 +734,7 @@ gst_ffmpegvidenc_flush_buffers (GstFFMpegVidEnc * ffmpegenc, gboolean send)
       GST_WARNING_OBJECT (ffmpegenc,
           "avenc_%s: failed to flush buffer", oclass->in_plugin->name);
 #endif /* GST_DISABLE_GST_DEBUG */
+      g_slice_free (AVPacket, pkt);
       gst_video_codec_frame_unref (frame);
       break;
     }
@@ -721,8 +747,9 @@ gst_ffmpegvidenc_flush_buffers (GstFFMpegVidEnc * ffmpegenc, gboolean send)
             GST_ERROR_SYSTEM);
 
     if (send && have_data) {
-      outbuf = gst_buffer_new_wrapped_full (0, pkt.data, pkt.size, 0, pkt.size,
-          pkt.data, av_free);
+      outbuf =
+          gst_buffer_new_wrapped_full (GST_MEMORY_FLAG_READONLY, pkt->data,
+          pkt->size, 0, pkt->size, pkt->data, gst_ffmpegvidenc_free_avpacket);
       frame->output_buffer = outbuf;
 
       if (ffmpegenc->context->coded_frame->key_frame)
