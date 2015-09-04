@@ -103,8 +103,6 @@ static gboolean gst_ffmpegvidenc_propose_allocation (GstVideoEncoder * encoder,
     GstQuery * query);
 static gboolean gst_ffmpegvidenc_flush (GstVideoEncoder * encoder);
 
-static GstCaps *gst_ffmpegvidenc_getcaps (GstVideoEncoder * encoder,
-    GstCaps * filter);
 static GstFlowReturn gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
     GstVideoCodecFrame * frame);
 
@@ -230,7 +228,6 @@ gst_ffmpegvidenc_class_init (GstFFMpegVidEncClass * klass)
   venc_class->stop = gst_ffmpegvidenc_stop;
   venc_class->finish = gst_ffmpegvidenc_finish;
   venc_class->handle_frame = gst_ffmpegvidenc_handle_frame;
-  venc_class->getcaps = gst_ffmpegvidenc_getcaps;
   venc_class->set_format = gst_ffmpegvidenc_set_format;
   venc_class->propose_allocation = gst_ffmpegvidenc_propose_allocation;
   venc_class->flush = gst_ffmpegvidenc_flush;
@@ -243,6 +240,8 @@ gst_ffmpegvidenc_init (GstFFMpegVidEnc * ffmpegenc)
 {
   GstFFMpegVidEncClass *klass =
       (GstFFMpegVidEncClass *) G_OBJECT_GET_CLASS (ffmpegenc);
+
+  GST_PAD_SET_ACCEPT_TEMPLATE (GST_VIDEO_ENCODER_SINK_PAD (ffmpegenc));
 
   /* ffmpeg objects */
   ffmpegenc->context = avcodec_alloc_context3 (klass->in_plugin);
@@ -281,19 +280,6 @@ gst_ffmpegvidenc_finalize (GObject * object)
   g_free (ffmpegenc->filename);
 
   G_OBJECT_CLASS (parent_class)->finalize (object);
-}
-
-static GstCaps *
-gst_ffmpegvidenc_getcaps (GstVideoEncoder * encoder, GstCaps * filter)
-{
-  GstFFMpegVidEnc *ffmpegenc = (GstFFMpegVidEnc *) encoder;
-  GstCaps *caps = NULL;
-
-  GST_DEBUG_OBJECT (ffmpegenc, "getting caps");
-
-  caps = gst_video_encoder_proxy_getcaps (encoder, NULL, filter);
-  GST_DEBUG_OBJECT (ffmpegenc, "return caps %" GST_PTR_FORMAT, caps);
-  return caps;
 }
 
 static gboolean
