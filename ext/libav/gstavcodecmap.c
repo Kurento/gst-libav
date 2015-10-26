@@ -954,6 +954,18 @@ gst_ffmpeg_codecid_to_caps (enum AVCodecID codec_id,
           "parsed", G_TYPE_BOOLEAN, TRUE, NULL);
       break;
 
+    case AV_CODEC_ID_JPEG2000:
+      caps =
+          gst_ff_vid_caps_new (context, NULL, codec_id, encode, "image/x-j2c",
+          NULL);
+      if (!encode) {
+        gst_caps_append (caps, gst_ff_vid_caps_new (context, NULL, codec_id,
+                encode, "image/x-jpc", NULL));
+        gst_caps_append (caps, gst_ff_vid_caps_new (context, NULL, codec_id,
+                encode, "image/jp2", NULL));
+      }
+      break;
+
     case AV_CODEC_ID_SP5X:
       caps =
           gst_ff_vid_caps_new (context, NULL, codec_id, encode, "video/sp5x",
@@ -2967,12 +2979,8 @@ gst_ffmpeg_caps_with_codecid (enum AVCodecID codec_id,
     GST_DEBUG ("have codec data of size %" G_GSIZE_FORMAT, map.size);
 
     gst_buffer_unmap (buf, &map);
-  } else if (context->extradata == NULL && codec_id != AV_CODEC_ID_AAC_LATM &&
-      codec_id != AV_CODEC_ID_FLAC) {
-    /* no extradata, alloc dummy with 0 sized, some codecs insist on reading
-     * extradata anyway which makes then segfault. */
-    context->extradata =
-        av_mallocz (GST_ROUND_UP_16 (FF_INPUT_BUFFER_PADDING_SIZE));
+  } else {
+    context->extradata = NULL;
     context->extradata_size = 0;
     GST_DEBUG ("no codec data");
   }

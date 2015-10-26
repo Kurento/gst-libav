@@ -3,7 +3,7 @@ AC_PREREQ(2.69)
 dnl initialize autoconf
 dnl when going to/from release please set the nano (fourth number) right !
 dnl releases only do Wall, cvs and prerelease does Werror too
-AC_INIT(GStreamer libav, 1.5.91,
+AC_INIT(GStreamer libav, 1.7.0.1,
     http://bugzilla.gnome.org/enter_bug.cgi?product=GStreamer,
     gst-libav)
 
@@ -40,11 +40,11 @@ GST_API_VERSION=1.5
 AC_SUBST(GST_API_VERSION)
 
 AG_GST_LIBTOOL_PREPARE
-AS_LIBTOOL(GST, 591, 0, 591)
+AS_LIBTOOL(GST, 700, 0, 700)
 
 dnl *** required versions of GStreamer stuff ***
-GST_REQ=1.5.91
-GST_PBREQ=1.5.91
+GST_REQ=1.7.0.1
+GST_PBREQ=1.7.0.1
 
 ORC_REQ=0.4.16
 ORC_CHECK([$ORC_REQ])
@@ -60,6 +60,7 @@ AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 dnl *** check for arguments to configure ***
 
 AG_GST_ARG_DISABLE_FATAL_WARNINGS
+AG_GST_ARG_ENABLE_EXTRA_CHECKS
 
 AG_GST_ARG_WITH_PKG_CONFIG_PATH
 AG_GST_ARG_WITH_PACKAGE_NAME
@@ -111,6 +112,11 @@ dnl *** checks for compiler characteristics ***
 dnl *** checks for library functions ***
 
 dnl *** checks for dependancy libraries ***
+
+dnl GLib is required
+GLIB_REQ=2.40.0
+AC_SUBST([GLIB_REQ])
+AG_GST_GLIB_CHECK([$GLIB_REQ])
 
 dnl checks for gstreamer
 dnl uninstalled is selected preferentially -- see pkg-config(1)
