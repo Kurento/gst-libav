@@ -46,5 +46,5 @@ install/gst-libav1.5::
 	rm -f debian/gstreamer1.5-libav/usr/lib/*/gstreamer-1.5/libgst*.a
 
 common-binary-fixup-arch::
-	dh_gstscancodecs
+	dh_gstscancodecs1.5
 
