@@ -99,6 +99,9 @@ gst_ffmpeg_channel_positions_to_layout (GstAudioChannelPosition * pos,
   if (!pos)
     return 0;
 
+  if (channels == 1 && pos[0] == GST_AUDIO_CHANNEL_POSITION_MONO)
+    return AV_CH_LAYOUT_MONO;
+
   for (i = 0; i < channels; i++) {
     for (j = 0; j < G_N_ELEMENTS (_ff_to_gst_layout); j++) {
       if (_ff_to_gst_layout[j].gst == pos[i]) {
@@ -126,6 +129,15 @@ gst_ffmpeg_channel_layout_to_gst (guint64 channel_layout, gint channels,
     none_layout = TRUE;
   } else {
     guint i, j;
+
+    /* Special path for mono, as AV_CH_LAYOUT_MONO is the same
+     * as FRONT_CENTER but we distinguish between the two in
+     * GStreamer
+     */
+    if (channels == 1 && channel_layout == AV_CH_LAYOUT_MONO) {
+      pos[0] = GST_AUDIO_CHANNEL_POSITION_MONO;
+      return TRUE;
+    }
 
     for (i = 0; i < 64; i++) {
       if ((channel_layout & (G_GUINT64_CONSTANT (1) << i)) != 0) {
@@ -756,10 +768,6 @@ gst_ffmpeg_codecid_to_caps (enum AVCodecID codec_id,
             "mpegversion", GST_TYPE_INT_RANGE, 1, 2,
             "systemstream", G_TYPE_BOOLEAN, FALSE, NULL);
       }
-      break;
-
-    case AV_CODEC_ID_MPEG2VIDEO_XVMC:
-      /* this is a special ID - don't need it in GStreamer, I think */
       break;
 
     case AV_CODEC_ID_H263:
@@ -2190,7 +2198,7 @@ gst_ffmpeg_codecid_to_caps (enum AVCodecID codec_id,
  */
 
 static GstCaps *
-gst_ffmpeg_pixfmt_to_caps (enum PixelFormat pix_fmt, AVCodecContext * context,
+gst_ffmpeg_pixfmt_to_caps (enum AVPixelFormat pix_fmt, AVCodecContext * context,
     enum AVCodecID codec_id)
 {
   GstCaps *caps = NULL;
@@ -2349,6 +2357,7 @@ gst_ffmpeg_caps_to_smpfmt (const GstCaps * caps,
   GstStructure *structure;
   const gchar *fmt;
   GstAudioFormat format = GST_AUDIO_FORMAT_UNKNOWN;
+  gint bitrate;
 
   g_return_if_fail (gst_caps_get_size (caps) == 1);
 
@@ -2357,7 +2366,8 @@ gst_ffmpeg_caps_to_smpfmt (const GstCaps * caps,
   gst_structure_get_int (structure, "channels", &context->channels);
   gst_structure_get_int (structure, "rate", &context->sample_rate);
   gst_structure_get_int (structure, "block_align", &context->block_align);
-  gst_structure_get_int (structure, "bitrate", &context->bit_rate);
+  if (gst_structure_get_int (structure, "bitrate", &bitrate))
+    context->bit_rate = bitrate;
 
   if (!raw)
     return;
@@ -2521,7 +2531,7 @@ gst_ffmpeg_caps_to_pixfmt (const GstCaps * caps,
 typedef struct
 {
   GstVideoFormat format;
-  enum PixelFormat pixfmt;
+  enum AVPixelFormat pixfmt;
 } PixToFmt;
 
 /* FIXME : FILLME */
@@ -2613,7 +2623,7 @@ static const PixToFmt pixtofmttable[] = {
 };
 
 GstVideoFormat
-gst_ffmpeg_pixfmt_to_videoformat (enum PixelFormat pixfmt)
+gst_ffmpeg_pixfmt_to_videoformat (enum AVPixelFormat pixfmt)
 {
   guint i;
 
@@ -2625,7 +2635,7 @@ gst_ffmpeg_pixfmt_to_videoformat (enum PixelFormat pixfmt)
   return GST_VIDEO_FORMAT_UNKNOWN;
 }
 
-static enum PixelFormat
+static enum AVPixelFormat
 gst_ffmpeg_videoformat_to_pixfmt_for_codec (GstVideoFormat format,
     const AVCodec * codec)
 {
@@ -2649,7 +2659,7 @@ gst_ffmpeg_videoformat_to_pixfmt_for_codec (GstVideoFormat format,
   return AV_PIX_FMT_NONE;
 }
 
-enum PixelFormat
+enum AVPixelFormat
 gst_ffmpeg_videoformat_to_pixfmt (GstVideoFormat format)
 {
   return gst_ffmpeg_videoformat_to_pixfmt_for_codec (format, NULL);

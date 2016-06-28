@@ -3,7 +3,7 @@ AC_PREREQ(2.69)
 dnl initialize autoconf
 dnl when going to/from release please set the nano (fourth number) right !
 dnl releases only do Wall, cvs and prerelease does Werror too
-AC_INIT(GStreamer libav, 1.7.0.1,
+AC_INIT(GStreamer libav, 1.8.2,
     http://bugzilla.gnome.org/enter_bug.cgi?product=GStreamer,
     gst-libav)
 
@@ -40,11 +40,11 @@ GST_API_VERSION=1.5
 AC_SUBST(GST_API_VERSION)
 
 AG_GST_LIBTOOL_PREPARE
-AS_LIBTOOL(GST, 700, 0, 700)
+AS_LIBTOOL(GST, 802, 0, 802)
 
 dnl *** required versions of GStreamer stuff ***
-GST_REQ=1.7.0.1
-GST_PBREQ=1.7.0.1
+GST_REQ=1.8.0
+GST_PBREQ=1.8.0
 
 ORC_REQ=0.4.16
 ORC_CHECK([$ORC_REQ])
@@ -129,6 +129,21 @@ AM_CONDITIONAL(HAVE_GST_CHECK, test "x$HAVE_GST_CHECK" = "xyes")
 AC_MSG_NOTICE(Using GStreamer Core Plugins in $GST_PLUGINS_DIR)
 AC_MSG_NOTICE(Using GStreamer Base Plugins in $GSTPB_PLUGINS_DIR)
 
+dnl Check for -Bsymbolic-functions linker flag used to avoid
+dnl intra-library PLT jumps, if available.
+AC_ARG_ENABLE(Bsymbolic,
+              [AS_HELP_STRING([--disable-Bsymbolic],[avoid linking with -Bsymbolic])],,
+              [SAVED_LDFLAGS="${LDFLAGS}" SAVED_LIBS="${LIBS}"
+               AC_MSG_CHECKING([for -Bsymbolic-functions linker flag])
+               LDFLAGS=-Wl,-Bsymbolic-functions
+               LIBS=
+               AC_TRY_LINK([], [return 0],
+                           AC_MSG_RESULT(yes)
+                           enable_Bsymbolic=yes,
+                           AC_MSG_RESULT(no)
+                           enable_Bsymbolic=no)
+               LDFLAGS="${SAVED_LDFLAGS}" LIBS="${SAVED_LIBS}"])
+
 dnl *** set variables based on configure arguments ***
 
 dnl set location of plugin directory
@@ -204,6 +219,9 @@ AC_SUBST(GST_CFLAGS)
 AC_SUBST(GST_LIBS)
 
 GST_ALL_LDFLAGS="-no-undefined"
+if test "x${enable_Bsymbolic}" = "xyes"; then
+  GST_ALL_LDFLAGS="$GST_ALL_LDFLAGS -Wl,-Bsymbolic-functions"
+fi
 AC_SUBST(GST_ALL_LDFLAGS)
 
 dnl this really should only contain flags, not libs - they get added before
@@ -262,15 +280,29 @@ AC_ARG_WITH(system-libav,
             [AC_HELP_STRING([--with-system-libav], [use system Libav libraries])])
 
 if test "x$with_system_libav" = "xyes"; then
-  PKG_CHECK_MODULES(LIBAV, libavformat libavcodec libavutil)
+  PKG_CHECK_MODULES(LIBAV, libavfilter libavformat libavcodec libavutil)
   PKG_CHECK_MODULES(SWSCALE, libswscale libavutil)
   saved_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="$CPPFLAGS $LIBAV_CFLAGS"
   AC_CHECK_HEADERS([avi.h])
-  CPPFLAGS="$saved_CPPFLAGS"
   AC_DEFINE([LIBAV_SOURCE], ["system install"], [Describes where the Libav libraries come from.])
   HAVE_LIBAV_UNINSTALLED=0
   AC_MSG_NOTICE([Using system-installed libav code])
+  AC_MSG_CHECKING([whether libav is provided by FFmpeg])
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+    #include <libavcodec/avcodec.h>
+    ]],[[
+        #if LIBAVCODEC_VERSION_MICRO >= 100
+        /* FFmpeg uses 100+ as its micro version */
+        #else
+        #error libav provider should be FFmpeg
+        #endif
+    ]])], [is_ffmpeg=yes], [is_ffmpeg=no])
+  AC_MSG_RESULT([$is_ffmpeg])
+  CPPFLAGS="$saved_CPPFLAGS"
+  if test "$is_ffmpeg" = no; then
+    AC_MSG_ERROR([Uncompatible libavcodec found])
+  fi
 else
   AC_MSG_NOTICE([Using local Libav snapshot])
   
@@ -281,13 +313,14 @@ else
 
   LIBAV_DEPS="\$(top_builddir)/gst-libs/ext/libav/libavformat/libavformat.a \
               \$(top_builddir)/gst-libs/ext/libav/libavcodec/libavcodec.a \
+              \$(top_builddir)/gst-libs/ext/libav/libavfilter/libavfilter.a \
               \$(top_builddir)/gst-libs/ext/libav/libswresample/libswresample.a \
               \$(top_builddir)/gst-libs/ext/libav/libavutil/libavutil.a"
   if test "x$enable_static_plugins" = xyes; then
       dnl with static linking we can't use the .a archive directly as they would
       dnl be included in the final libgstlibav.a as a file and won't be usable.
       dnl libav*.a must be copied to the final destination too
-      LIBAV_LIBS="-lavformat -lavcodec -lswresample -lavutil"
+      LIBAV_LIBS="-lavformat -lavcodec -lswresample -lavutil -lavfilter"
   else
       dnl libgstlibav.la: libs to statically link to
       LIBAV_LIBS="$LIBAV_DEPS"
@@ -325,11 +358,11 @@ else
   # Enable pic and static so that we get .a files, but with PIC code.
   emblibav_configure_args="$emblibav_configure_args \
         --enable-static --enable-pic \
-        --disable-avdevice --disable-postproc --disable-avfilter \
+        --disable-avdevice --disable-postproc \
         --disable-programs --disable-ffserver --disable-ffplay --disable-ffprobe --disable-ffmpeg \
         --disable-encoder=flac --disable-protocols --disable-devices \
         --disable-network --disable-hwaccels --disable-dxva2 --disable-vdpau \
-        --disable-filters --disable-doc --disable-vda --disable-d3d11va --disable-dxva2 \
+        --disable-filters --enable-filter=yadif --disable-doc --disable-vda --disable-d3d11va --disable-dxva2 \
         --disable-iconv --enable-optimizations"
 
   if test "x$enable_gpl" == "xyes"; then

@@ -290,7 +290,7 @@ gst_ffmpegvidenc_set_format (GstVideoEncoder * encoder,
   GstCaps *allowed_caps;
   GstCaps *icaps;
   GstVideoCodecState *output_format;
-  enum PixelFormat pix_fmt;
+  enum AVPixelFormat pix_fmt;
   GstFFMpegVidEnc *ffmpegenc = (GstFFMpegVidEnc *) encoder;
   GstFFMpegVidEncClass *oclass =
       (GstFFMpegVidEncClass *) G_OBJECT_GET_CLASS (ffmpegenc);
@@ -465,8 +465,7 @@ gst_ffmpegvidenc_set_format (GstVideoEncoder * encoder,
     goto bad_input_fmt;
 
   /* second pass stats buffer no longer needed */
-  if (ffmpegenc->context->stats_in)
-    g_free (ffmpegenc->context->stats_in);
+  g_free (ffmpegenc->context->stats_in);
 
   /* Store input state and set output state */
   if (ffmpegenc->input_state)
@@ -556,8 +555,7 @@ close_codec:
   }
 cleanup_stats_in:
   {
-    if (ffmpegenc->context->stats_in)
-      g_free (ffmpegenc->context->stats_in);
+    g_free (ffmpegenc->context->stats_in);
     return FALSE;
   }
 }
@@ -645,6 +643,10 @@ gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
     }
   }
 
+  ffmpegenc->picture->format = ffmpegenc->context->pix_fmt;
+  ffmpegenc->picture->width = GST_VIDEO_FRAME_WIDTH (&buffer_info->vframe);
+  ffmpegenc->picture->height = GST_VIDEO_FRAME_HEIGHT (&buffer_info->vframe);
+
   ffmpegenc->picture->pts =
       gst_ffmpeg_time_gst_to_ff (frame->pts /
       ffmpegenc->context->ticks_per_frame, ffmpegenc->context->time_base);
@@ -665,8 +667,7 @@ gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
     goto encode_fail;
 
   /* Encoder needs more data */
-  if (!have_data)
-  {
+  if (!have_data) {
     gst_video_codec_frame_unref (frame);
     return GST_FLOW_OK;
   }
@@ -688,12 +689,10 @@ gst_ffmpegvidenc_handle_frame (GstVideoEncoder * encoder,
       pkt->size, 0, pkt->size, pkt, gst_ffmpegvidenc_free_avpacket);
   frame->output_buffer = outbuf;
 
-  /* buggy codec may not set coded_frame */
-  if (ffmpegenc->context->coded_frame) {
-    if (ffmpegenc->context->coded_frame->key_frame)
-      GST_VIDEO_CODEC_FRAME_SET_SYNC_POINT (frame);
-  } else
-    GST_WARNING_OBJECT (ffmpegenc, "codec did not provide keyframe info");
+  if (pkt->flags & AV_PKT_FLAG_KEY)
+    GST_VIDEO_CODEC_FRAME_SET_SYNC_POINT (frame);
+  else
+    GST_VIDEO_CODEC_FRAME_UNSET_SYNC_POINT (frame);
 
   return gst_video_encoder_finish_frame (encoder, frame);
 
@@ -759,8 +758,10 @@ gst_ffmpegvidenc_flush_buffers (GstFFMpegVidEnc * ffmpegenc, gboolean send)
           pkt->size, 0, pkt->size, pkt, gst_ffmpegvidenc_free_avpacket);
       frame->output_buffer = outbuf;
 
-      if (ffmpegenc->context->coded_frame->key_frame)
+      if (pkt->flags & AV_PKT_FLAG_KEY)
         GST_VIDEO_CODEC_FRAME_SET_SYNC_POINT (frame);
+      else
+        GST_VIDEO_CODEC_FRAME_UNSET_SYNC_POINT (frame);
 
       flow_ret =
           gst_video_encoder_finish_frame (GST_VIDEO_ENCODER (ffmpegenc), frame);

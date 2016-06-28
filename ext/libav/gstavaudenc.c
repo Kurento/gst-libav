@@ -269,8 +269,9 @@ gst_ffmpegaudenc_set_format (GstAudioEncoder * encoder, GstAudioInfo * info)
     ffmpegaudenc->context->bit_rate = ffmpegaudenc->bitrate;
     ffmpegaudenc->context->bit_rate_tolerance = ffmpegaudenc->bitrate;
   } else {
-    GST_INFO_OBJECT (ffmpegaudenc, "Using avcontext default bitrate %d",
-        ffmpegaudenc->context->bit_rate);
+    GST_INFO_OBJECT (ffmpegaudenc,
+        "Using avcontext default bitrate %" G_GINT64_FORMAT,
+        (gint64) ffmpegaudenc->context->bit_rate);
   }
 
   /* RTP payload used for GOB production (for Asterisk) */
@@ -433,8 +434,8 @@ buffer_info_free (void *opaque, guint8 * data)
     gst_buffer_unmap (info->buffer, &info->map);
     gst_buffer_unref (info->buffer);
   } else {
-    g_free (info->ext_data);
-    g_free (info->ext_data_array);
+    av_free (info->ext_data);
+    av_free (info->ext_data_array);
   }
   g_slice_free (BufferInfo, info);
 }
@@ -474,6 +475,10 @@ gst_ffmpegaudenc_encode_audio (GstFFMpegAudEnc * ffmpegaudenc,
 
     info = gst_audio_encoder_get_audio_info (enc);
     planar = av_sample_fmt_is_planar (ffmpegaudenc->context->sample_fmt);
+    frame->format = ffmpegaudenc->context->sample_fmt;
+    frame->sample_rate = ffmpegaudenc->context->sample_rate;
+    frame->channels = ffmpegaudenc->context->channels;
+    frame->channel_layout = ffmpegaudenc->context->channel_layout;
 
     if (planar && info->channels > 1) {
       gint channels;
@@ -487,12 +492,12 @@ gst_ffmpegaudenc_encode_audio (GstFFMpegAudEnc * ffmpegaudenc,
 
       if (info->channels > AV_NUM_DATA_POINTERS) {
         buffer_info->ext_data_array = frame->extended_data =
-            g_new (uint8_t *, info->channels);
+            av_malloc_array (info->channels, sizeof (uint8_t *));
       } else {
         frame->extended_data = frame->data;
       }
 
-      buffer_info->ext_data = frame->extended_data[0] = g_malloc (in_size);
+      buffer_info->ext_data = frame->extended_data[0] = av_malloc (in_size);
       frame->linesize[0] = in_size / channels;
       for (i = 1; i < channels; i++)
         frame->extended_data[i] =

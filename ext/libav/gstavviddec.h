@@ -41,7 +41,7 @@ struct _GstFFMpegVidDec
   gboolean opened;
 
   /* current output pictures */
-  enum PixelFormat pic_pix_fmt;
+  enum AVPixelFormat pic_pix_fmt;
   gint pic_width;
   gint pic_height;
   gint pic_par_n;
@@ -64,15 +64,13 @@ struct _GstFFMpegVidDec
   int max_threads;
   gboolean output_corrupt;
 
-  gboolean is_realvideo;
-
   GstCaps *last_caps;
 
   /* Internally used for direct rendering */
   GstBufferPool *internal_pool;
   gint pool_width;
   gint pool_height;
-  enum PixelFormat pool_format;
+  enum AVPixelFormat pool_format;
   GstVideoInfo pool_info;
 };
 

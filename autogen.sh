@@ -37,7 +37,11 @@ fi
 if test ! \( -x .git/hooks/pre-commit -a -L .git/hooks/pre-commit \);
 then
     rm -f .git/hooks/pre-commit
-    ln -s ../../common/hooks/pre-commit.hook .git/hooks/pre-commit
+    if ! ln -s ../../common/hooks/pre-commit.hook .git/hooks/pre-commit 2> /dev/null
+    then
+        echo "Failed to create commit hook symlink, copying instead ..."
+        cp common/hooks/pre-commit.hook .git/hooks/pre-commit
+    fi
 fi
 
 # GNU gettext automake support doesn't get along with git.
@@ -50,6 +54,8 @@ CONFIGURE_DEF_OPT='--enable-maintainer-mode --enable-gtk-doc'
 
 if test "x$package" = "xgstreamer"; then
   CONFIGURE_DEF_OPT="$CONFIGURE_DEF_OPT --enable-docbook --enable-failing-tests --enable-poisoning"
+elif test "x$package" = "xgst-plugins-bad"; then
+  CONFIGURE_DEF_OPT="$CONFIGURE_DEF_OPT --with-player-tests"
 fi
 
 autogen_options $@

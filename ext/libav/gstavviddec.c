@@ -37,8 +37,6 @@
 #include "gstavutils.h"
 #include "gstavviddec.h"
 
-GST_DEBUG_CATEGORY_EXTERN (GST_CAT_PERFORMANCE);
-
 #define MAX_TS_MASK 0xff
 
 #define DEFAULT_LOWRES			0
@@ -331,10 +329,6 @@ gst_ffmpegviddec_close (GstFFMpegVidDec * ffmpegdec, gboolean reset)
     av_free (ffmpegdec->context->extradata);
     ffmpegdec->context->extradata = NULL;
   }
-  if (ffmpegdec->context->slice_offset) {
-    g_free (ffmpegdec->context->slice_offset);
-    ffmpegdec->context->slice_offset = NULL;
-  }
   if (reset) {
     if (avcodec_get_context_defaults3 (ffmpegdec->context,
             oclass->in_plugin) < 0) {
@@ -362,22 +356,9 @@ gst_ffmpegviddec_open (GstFFMpegVidDec * ffmpegdec)
     ffmpegdec->stride[i] = -1;
 
   ffmpegdec->opened = TRUE;
-  ffmpegdec->is_realvideo = FALSE;
 
   GST_LOG_OBJECT (ffmpegdec, "Opened libav codec %s, id %d",
       oclass->in_plugin->name, oclass->in_plugin->id);
-
-  switch (oclass->in_plugin->id) {
-    case AV_CODEC_ID_RV10:
-    case AV_CODEC_ID_RV30:
-    case AV_CODEC_ID_RV20:
-    case AV_CODEC_ID_RV40:
-      ffmpegdec->is_realvideo = TRUE;
-      break;
-    default:
-      GST_LOG_OBJECT (ffmpegdec, "Parser deactivated for format");
-      break;
-  }
 
   gst_ffmpegviddec_context_set_flags (ffmpegdec->context,
       CODEC_FLAG_OUTPUT_CORRUPT, ffmpegdec->output_corrupt);
@@ -461,9 +442,6 @@ gst_ffmpegviddec_set_format (GstVideoDecoder * decoder,
 
   /* set buffer functions */
   ffmpegdec->context->get_buffer2 = gst_ffmpegviddec_get_buffer2;
-  ffmpegdec->context->get_buffer = NULL;
-  ffmpegdec->context->reget_buffer = NULL;
-  ffmpegdec->context->release_buffer = NULL;
   ffmpegdec->context->draw_horiz_band = NULL;
 
   /* reset coded_width/_height to prevent it being reused from last time when
@@ -842,10 +820,6 @@ gst_ffmpegviddec_get_buffer2 (AVCodecContext * context, AVFrame * picture,
 
   picture->buf[0] = av_buffer_create (NULL, 0, dummy_free_buffer, dframe, 0);
 
-  /* tell ffmpeg we own this buffer, transfer the ref we have on the buffer to
-   * the opaque data. */
-  picture->type = FF_BUFFER_TYPE_USER;
-
   GST_LOG_OBJECT (ffmpegdec, "returned frame %p", dframe->buffer);
 
   return 0;
@@ -1037,6 +1011,7 @@ gst_ffmpegviddec_negotiate (GstFFMpegVidDec * ffmpegdec,
   GstVideoInfo *in_info, *out_info;
   GstVideoCodecState *output_state;
   gint fps_n, fps_d;
+  GstClockTime latency;
 
   if (!update_video_context (ffmpegdec, context, picture))
     return TRUE;
@@ -1118,6 +1093,15 @@ gst_ffmpegviddec_negotiate (GstFFMpegVidDec * ffmpegdec,
 
   if (!gst_video_decoder_negotiate (GST_VIDEO_DECODER (ffmpegdec)))
     goto negotiate_failed;
+
+  /* The decoder is configured, we now know the true latency */
+  if (fps_n) {
+    latency =
+        gst_util_uint64_scale_ceil (ffmpegdec->context->has_b_frames *
+        GST_SECOND, fps_d, fps_n);
+    gst_video_decoder_set_latency (GST_VIDEO_DECODER (ffmpegdec), latency,
+        latency);
+  }
 
   return TRUE;
 
@@ -1203,7 +1187,7 @@ static GstFlowReturn
 get_output_buffer (GstFFMpegVidDec * ffmpegdec, GstVideoCodecFrame * frame)
 {
   GstFlowReturn ret = GST_FLOW_OK;
-  AVPicture pic, *outpic;
+  AVFrame pic, *outpic;
   GstVideoFrame vframe;
   GstVideoInfo *info;
   gint c;
@@ -1227,6 +1211,10 @@ get_output_buffer (GstFFMpegVidDec * ffmpegdec, GstVideoCodecFrame * frame)
           GST_MAP_READ | GST_MAP_WRITE))
     goto map_failed;
 
+  memset (&pic, 0, sizeof (pic));
+  pic.format = ffmpegdec->pic_pix_fmt;
+  pic.width = GST_VIDEO_FRAME_WIDTH (&vframe);
+  pic.height = GST_VIDEO_FRAME_HEIGHT (&vframe);
   for (c = 0; c < AV_NUM_DATA_POINTERS; c++) {
     if (c < GST_VIDEO_INFO_N_PLANES (info)) {
       pic.data[c] = GST_VIDEO_FRAME_PLANE_DATA (&vframe, c);
@@ -1239,10 +1227,12 @@ get_output_buffer (GstFFMpegVidDec * ffmpegdec, GstVideoCodecFrame * frame)
     }
   }
 
-  outpic = (AVPicture *) ffmpegdec->picture;
+  outpic = ffmpegdec->picture;
 
-  av_picture_copy (&pic, outpic, ffmpegdec->context->pix_fmt,
-      GST_VIDEO_INFO_WIDTH (info), GST_VIDEO_INFO_HEIGHT (info));
+  if (av_frame_copy (&pic, outpic) != 0) {
+    GST_ERROR_OBJECT (ffmpegdec, "Failed to copy output frame");
+    ret = GST_FLOW_ERROR;
+  }
 
   gst_video_frame_unmap (&vframe);
 
@@ -1314,24 +1304,6 @@ gst_ffmpegviddec_video_frame (GstFFMpegVidDec * ffmpegdec,
    * else we might skip a reference frame */
   gst_ffmpegviddec_do_qos (ffmpegdec, frame, &mode_switch);
 
-  if (ffmpegdec->is_realvideo && data != NULL) {
-    gint slice_count;
-    gint i;
-
-    /* setup the slice table for realvideo */
-    if (ffmpegdec->context->slice_offset == NULL)
-      ffmpegdec->context->slice_offset = g_malloc (sizeof (guint32) * 1000);
-
-    slice_count = (*data++) + 1;
-    ffmpegdec->context->slice_count = slice_count;
-
-    for (i = 0; i < slice_count; i++) {
-      data += 4;
-      ffmpegdec->context->slice_offset[i] = GST_READ_UINT32_LE (data);
-      data += 4;
-    }
-  }
-
   if (frame) {
     /* save reference to the timing info */
     ffmpegdec->context->reordered_opaque = (gint64) frame->system_frame_number;
@@ -1390,8 +1362,6 @@ gst_ffmpegviddec_video_frame (GstFFMpegVidDec * ffmpegdec,
       (guint64) ffmpegdec->picture->pts);
   GST_DEBUG_OBJECT (ffmpegdec, "picture: num %d",
       ffmpegdec->picture->coded_picture_number);
-  GST_DEBUG_OBJECT (ffmpegdec, "picture: ref %d",
-      ffmpegdec->picture->reference);
   GST_DEBUG_OBJECT (ffmpegdec, "picture: display %d",
       ffmpegdec->picture->display_picture_number);
   GST_DEBUG_OBJECT (ffmpegdec, "picture: opaque %p",
@@ -1416,6 +1386,16 @@ gst_ffmpegviddec_video_frame (GstFFMpegVidDec * ffmpegdec,
     *ret = get_output_buffer (ffmpegdec, out_frame);
     gst_buffer_unref (tmp);
   }
+#ifndef G_DISABLE_ASSERT
+  else {
+    GstVideoMeta *vmeta = gst_buffer_get_video_meta (out_frame->output_buffer);
+    if (vmeta) {
+      GstVideoInfo *info = &ffmpegdec->output_state->info;
+      g_assert (vmeta->width == GST_VIDEO_INFO_WIDTH (info));
+      g_assert (vmeta->height == GST_VIDEO_INFO_HEIGHT (info));
+    }
+  }
+#endif
   gst_object_unref (pool);
 
   if (G_UNLIKELY (*ret != GST_FLOW_OK))
@@ -1624,7 +1604,7 @@ gst_ffmpegviddec_handle_frame (GstVideoDecoder * decoder,
       GST_LOG_OBJECT (ffmpegdec, "resized padding buffer to %d",
           ffmpegdec->padded_size);
     }
-    GST_CAT_TRACE_OBJECT (GST_CAT_PERFORMANCE, ffmpegdec,
+    GST_CAT_TRACE_OBJECT (CAT_PERFORMANCE, ffmpegdec,
         "Copy input to add padding");
     memcpy (ffmpegdec->padded, bdata, bsize);
     memset (ffmpegdec->padded + bsize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
@@ -1644,7 +1624,7 @@ gst_ffmpegviddec_handle_frame (GstVideoDecoder * decoder,
 
     if (do_padding) {
       /* add temporary padding */
-      GST_CAT_TRACE_OBJECT (GST_CAT_PERFORMANCE, ffmpegdec,
+      GST_CAT_TRACE_OBJECT (CAT_PERFORMANCE, ffmpegdec,
           "Add temporary input padding");
       memcpy (tmp_padding, data + size, FF_INPUT_BUFFER_PADDING_SIZE);
       memset (data + size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
@@ -1854,7 +1834,7 @@ gst_ffmpegviddec_decide_allocation (GstVideoDecoder * decoder, GstQuery * query)
         config_copy);
 
     /* FIXME validate and retry */
-    if (gst_buffer_pool_set_config (pool, gst_structure_copy (config_copy))) {
+    if (gst_buffer_pool_set_config (pool, config_copy)) {
       GstFlowReturn ret;
       GstBuffer *tmp;
 
@@ -1886,7 +1866,9 @@ gst_ffmpegviddec_decide_allocation (GstVideoDecoder * decoder, GstQuery * query)
     }
   }
 
-  if (have_videometa && ffmpegdec->internal_pool) {
+  if (have_videometa && ffmpegdec->internal_pool
+      && ffmpegdec->pool_width == state->info.width
+      && ffmpegdec->pool_height == state->info.height) {
     update_pool = TRUE;
     gst_object_unref (pool);
     pool = gst_object_ref (ffmpegdec->internal_pool);
@@ -2124,6 +2106,8 @@ gst_ffmpegviddec_register (GstPlugin * plugin)
      * msmpeg4v3 same, as it outperforms divxdec for divx3 playback.
      * VC1/WMV3 are not working and thus unpreferred for now. */
     switch (in_plugin->id) {
+      case AV_CODEC_ID_MPEG1VIDEO:
+      case AV_CODEC_ID_MPEG2VIDEO:
       case AV_CODEC_ID_MPEG4:
       case AV_CODEC_ID_MSMPEG4V3:
       case AV_CODEC_ID_H264:

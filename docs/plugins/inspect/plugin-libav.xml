@@ -3,7 +3,7 @@
   <description>All libav codecs and formats (local snapshot)</description>
   <filename>../../ext/libav/.libs/libgstlibav.so</filename>
   <basename>libgstlibav.so</basename>
-  <version>1.6.0</version>
+  <version>1.8.2</version>
   <license>LGPL</license>
   <source>gst-libav</source>
   <package>libav</package>
@@ -287,6 +287,27 @@
       <longname>libav ADPCM Nintendo Gamecube AFC decoder</longname>
       <class>Codec/Decoder/Audio</class>
       <description>libav adpcm_afc decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string)S16LE</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avdec_adpcm_aica</name>
+      <longname>libav ADPCM Yamaha AICA decoder</longname>
+      <class>Codec/Decoder/Audio</class>
+      <description>libav adpcm_aica decoder</description>
       <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
       <pads>
         <caps>
@@ -756,6 +777,27 @@
           <direction>sink</direction>
           <presence>always</presence>
           <details>audio/x-adpcm, layout=(string)microsoft</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string)S16LE</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avdec_adpcm_psx</name>
+      <longname>libav ADPCM Playstation decoder</longname>
+      <class>Codec/Decoder/Audio</class>
+      <description>libav adpcm_psx decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
         </caps>
         <caps>
           <name>src</name>
@@ -1774,6 +1816,27 @@
       </pads>
     </element>
     <element>
+      <name>avdec_cfhd</name>
+      <longname>libav Cineform HD decoder</longname>
+      <class>Codec/Decoder/Video</class>
+      <description>libav cfhd decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
       <name>avdec_cinepak</name>
       <longname>libav Cinepak decoder</longname>
       <class>Codec/Decoder/Video</class>
@@ -1937,7 +2000,7 @@
           <name>src</name>
           <direction>source</direction>
           <presence>always</presence>
-          <details>audio/x-raw, layout=(string)interleaved, format=(string)F32LE</details>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string){ S16LE, S32LE, F32LE }</details>
         </caps>
       </pads>
     </element>
@@ -2194,6 +2257,27 @@
       </pads>
     </element>
     <element>
+      <name>avdec_dvaudio</name>
+      <longname>libav Ulead DV Audio decoder</longname>
+      <class>Codec/Decoder/Audio</class>
+      <description>libav dvaudio decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>audio/x-dv</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string){ U8, S16LE, S32LE, F32LE, F64LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
       <name>avdec_dvvideo</name>
       <longname>libav DV (Digital Video) decoder</longname>
       <class>Codec/Decoder/Video</class>
@@ -2240,6 +2324,27 @@
       <longname>libav Dxtory decoder</longname>
       <class>Codec/Decoder/Video</class>
       <description>libav dxtory decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avdec_dxv</name>
+      <longname>libav Resolume DXV decoder</longname>
+      <class>Codec/Decoder/Video</class>
+      <description>libav dxv decoder</description>
       <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
       <pads>
         <caps>
@@ -3286,6 +3391,27 @@
       </pads>
     </element>
     <element>
+      <name>avdec_interplayacm</name>
+      <longname>libav Interplay ACM decoder</longname>
+      <class>Codec/Decoder/Audio</class>
+      <description>libav interplayacm decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string){ U8, S16LE, S32LE, F32LE, F64LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
       <name>avdec_interplayvideo</name>
       <longname>libav Interplay MVE video decoder</longname>
       <class>Codec/Decoder/Video</class>
@@ -3317,7 +3443,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>unknown/unknown</details>
+          <details>image/x-j2c; image/x-jpc; image/jp2</details>
         </caps>
         <caps>
           <name>src</name>
@@ -4945,6 +5071,27 @@
       </pads>
     </element>
     <element>
+      <name>avdec_rscc</name>
+      <longname>libav innoHeim/Rsupport Screen Capture Codec decoder</longname>
+      <class>Codec/Decoder/Video</class>
+      <description>libav rscc decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
       <name>avdec_rv10</name>
       <longname>libav RealVideo 1.0 decoder</longname>
       <class>Codec/Decoder/Video</class>
@@ -5067,6 +5214,48 @@
           <direction>source</direction>
           <presence>always</presence>
           <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avdec_screenpresso</name>
+      <longname>libav Screenpresso decoder</longname>
+      <class>Codec/Decoder/Video</class>
+      <description>libav screenpresso decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avdec_sdx2_dpcm</name>
+      <longname>libav DPCM Squareroot-Delta-Exact decoder</longname>
+      <class>Codec/Decoder/Audio</class>
+      <description>libav sdx2_dpcm decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string){ U8, S16LE, S32LE, F32LE, F64LE }</details>
         </caps>
       </pads>
     </element>
@@ -5932,27 +6121,6 @@
       </pads>
     </element>
     <element>
-      <name>avdec_vima</name>
-      <longname>libav LucasArts VIMA audio decoder</longname>
-      <class>Codec/Decoder/Audio</class>
-      <description>libav vima decoder</description>
-      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
-      <pads>
-        <caps>
-          <name>sink</name>
-          <direction>sink</direction>
-          <presence>always</presence>
-          <details>unknown/unknown</details>
-        </caps>
-        <caps>
-          <name>src</name>
-          <direction>source</direction>
-          <presence>always</presence>
-          <details>audio/x-raw, layout=(string)interleaved, format=(string){ U8, S16LE, S32LE, F32LE, F64LE }</details>
-        </caps>
-      </pads>
-    </element>
-    <element>
       <name>avdec_vmdaudio</name>
       <longname>libav Sierra VMD audio decoder</longname>
       <class>Codec/Decoder/Audio</class>
@@ -6621,6 +6789,48 @@
           <direction>source</direction>
           <presence>always</presence>
           <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avdec_xma1</name>
+      <longname>libav Xbox Media Audio 1 decoder</longname>
+      <class>Codec/Decoder/Audio</class>
+      <description>libav xma1 decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string)F32LE</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avdec_xma2</name>
+      <longname>libav Xbox Media Audio 2 decoder</longname>
+      <class>Codec/Decoder/Audio</class>
+      <description>libav xma2 decoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;, Edward Hervey &lt;bilboed@bilboed.com&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>audio/x-raw, layout=(string)interleaved, format=(string)F32LE</details>
         </caps>
       </pads>
     </element>
@@ -7703,7 +7913,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000103, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000033, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000c, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000b, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010b, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000f, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010f, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000103, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000033, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000c, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000b, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010b, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000f, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010f, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE</details>
         </caps>
         <caps>
           <name>src</name>
@@ -7724,7 +7934,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000103, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000033, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000c, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000b, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010b, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000f, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010f, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000103, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000033, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000c, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000b, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010b, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000f, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010f, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)S16LE</details>
         </caps>
         <caps>
           <name>src</name>
@@ -7871,7 +8081,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x000000000000013f, channels=(int)7, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x00000000000000ff, channels=(int)8, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x000000000000013f, channels=(int)7, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }; audio/x-raw, channel-mask=(bitmask)0x00000000000000ff, channels=(int)8, rate=(int)[ 4000, 96000 ], layout=(string)interleaved, format=(string){ S32LE, S16LE }</details>
         </caps>
         <caps>
           <name>src</name>
@@ -8144,7 +8354,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 8000, 16000, 32000, 11025, 22050, 44100, 12000, 24000, 48000 }, layout=(string)interleaved, format=(string)S32LE</details>
         </caps>
         <caps>
           <name>src</name>
@@ -8228,7 +8438,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000103, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000033, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000c, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000b, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010b, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000f, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010f, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000103, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000007, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c03, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000033, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000107, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c07, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000037, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000c, channels=(int)2, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000b, channels=(int)3, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010b, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000000f, channels=(int)4, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003b, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000010f, channels=(int)5, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000c0f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE; audio/x-raw, channel-mask=(bitmask)0x000000000000003f, channels=(int)6, rate=(int){ 48000, 44100, 32000 }, layout=(string)interleaved, format=(string)F32LE</details>
         </caps>
         <caps>
           <name>src</name>
@@ -8507,7 +8717,7 @@
           <name>src</name>
           <direction>source</direction>
           <presence>always</presence>
-          <details>unknown/unknown</details>
+          <details>image/x-j2c</details>
         </caps>
       </pads>
     </element>
@@ -8585,7 +8795,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE</details>
         </caps>
         <caps>
           <name>src</name>
@@ -8606,7 +8816,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE; audio/x-raw, channel-mask=(bitmask)0x0000000000000003, channels=(int)2, rate=(int){ 48000, 44100, 32000, 24000, 22050, 16000 }, layout=(string)interleaved, format=(string)S16LE</details>
         </caps>
         <caps>
           <name>src</name>
@@ -9110,7 +9320,7 @@
           <name>sink</name>
           <direction>sink</direction>
           <presence>always</presence>
-          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000004, channels=(int)1, rate=(int)8000, layout=(string)interleaved, format=(string)S16LE</details>
+          <details>audio/x-raw, channel-mask=(bitmask)0x0000000000000000, channels=(int)1, rate=(int)8000, layout=(string)interleaved, format=(string)S16LE</details>
         </caps>
         <caps>
           <name>src</name>
@@ -9499,6 +9709,27 @@
       </pads>
     </element>
     <element>
+      <name>avenc_vc2</name>
+      <longname>libav SMPTE VC-2 encoder</longname>
+      <class>Codec/Encoder/Video</class>
+      <description>libav vc2 encoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>video/x-raw, format=(string){ I420, Y42B, Y444, I420_10LE, I422_10LE, Y444_10LE }</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
       <name>avenc_wavpack</name>
       <longname>libav WavPack encoder</longname>
       <class>Codec/Encoder/Audio</class>
@@ -9600,6 +9831,27 @@
           <direction>source</direction>
           <presence>always</presence>
           <details>video/x-wmv, wmvversion=(int)2</details>
+        </caps>
+      </pads>
+    </element>
+    <element>
+      <name>avenc_wrapped_avframe</name>
+      <longname>libav AVFrame to AVPacket passthrough encoder</longname>
+      <class>Codec/Encoder/Video</class>
+      <description>libav wrapped_avframe encoder</description>
+      <author>Wim Taymans &lt;wim.taymans@gmail.com&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;</author>
+      <pads>
+        <caps>
+          <name>sink</name>
+          <direction>sink</direction>
+          <presence>always</presence>
+          <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
+        </caps>
+        <caps>
+          <name>src</name>
+          <direction>source</direction>
+          <presence>always</presence>
+          <details>unknown/unknown</details>
         </caps>
       </pads>
     </element>
@@ -11437,12 +11689,6 @@
       <description>libav YUV4MPEG pipe muxer (not recommended, use y4menc instead)</description>
       <author>Wim Taymans &lt;wim.taymans@chello.be&gt;, Ronald Bultje &lt;rbultje@ronald.bitfreak.net&gt;</author>
       <pads>
-        <caps>
-          <name>video_%u</name>
-          <direction>sink</direction>
-          <presence>request</presence>
-          <details>video/x-raw, format=(string){ I420, YUY2, RGB, BGR, Y42B, Y444, YUV9, Y41B, GRAY8, RGB8P, I420, Y42B, Y444, UYVY, NV12, NV21, ARGB, RGBA, ABGR, BGRA, GRAY16_BE, GRAY16_LE, A420, RGB16, RGB15, I420_10BE, I420_10LE, I422_10BE, I422_10LE, Y444_10BE, Y444_10LE, GBR, GBR_10BE, GBR_10LE, A420_10BE, A420_10LE, A422_10BE, A422_10LE, A444_10BE, A444_10LE }</details>
-        </caps>
         <caps>
           <name>src</name>
           <direction>source</direction>
