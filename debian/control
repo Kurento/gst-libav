@@ -24,6 +24,9 @@ Build-Depends: debhelper (>= 9),
                libavcodec-dev (>= 6:11~),
                libavformat-dev (>= 6:11~),
                libswscale-dev (>= 6:11~),
+               libavfilter-dev (>= 6:11~),
+               libavresample-dev (>= 6:11~),
+               libavutil-dev (>= 6:11~),
                libbz2-dev,
                yasm
 Standards-Version: 3.9.3
