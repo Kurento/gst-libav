@@ -21,12 +21,6 @@ Build-Depends: debhelper (>= 9),
                libgstreamer1.5-dev (>= 1.5.0.1~0),
                libgstreamer-plugins-base1.5-dev (>= 1.5.0.1~0),
                liborc-0.4-dev (>= 1:0.4.16),
-               libavcodec-dev (>= 6:11~),
-               libavformat-dev (>= 6:11~),
-               libswscale-dev (>= 6:11~),
-               libavfilter-dev (>= 6:11~),
-               libavresample-dev (>= 6:11~),
-               libavutil-dev (>= 6:11~),
                libbz2-dev,
                yasm
 Standards-Version: 3.9.3
