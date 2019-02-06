@@ -1,3 +1,17 @@
+gst-libav1.5 (1.8.1-1kurento1) UNRELEASED; urgency=medium
+
+  [ Jose Antonio Santos Cadenas ]
+  * Fix build dependencies
+  * Revert "Fix build dependencies"
+  * debian/rules: use gstscancodecs1.5
+  * debian/control: Add more build dependencies
+  * debian: Compile libav wrapped with the plugin
+
+  [ Juan Navarro ]
+  * debian/rules: Run pre-build command with dh-autoreconf
+
+ -- Juan Navarro <juan.navarro@gmx.es>  Wed, 06 Feb 2019 19:33:07 +0100
+
 gst-libav1.5 (1.5.0.1) experimental; urgency=medium
 
   * Change package name to diferenciate between versions
